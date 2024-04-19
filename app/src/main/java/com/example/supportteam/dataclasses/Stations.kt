@@ -3,8 +3,9 @@ package com.example.supportteam.dataclasses
 
 data class Stations(
     val AlarmId: Int,
+    val employee: Int,
     val id_stations: Int,
-    val al_status:Int,
+    var al_status:Int,
     val createdAt: String,
     val updatedAt: String,
     val id: Int,

@@ -9,6 +9,7 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,9 +17,11 @@ import com.example.supportteam.adapter.StationsAdapter
 import com.example.supportteam.api.MyApi
 import com.example.supportteam.databinding.ActivityMainBinding
 import com.example.supportteam.dataclasses.Stations
+import com.example.supportteam.dataclasses.StationsProvider
 import com.example.supportteam.dataclasses.StationsWithAlarmsStatus
 import com.example.supportteam.dataclasses.SupportAlarms
 import com.example.supportteam.services.RunningServices
+import com.example.supportteam.viewmodel.StationsViewModel
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
@@ -39,12 +42,14 @@ class MainActivity : ComponentActivity() {
 
     private var stationsList = listOf<Stations>()
 
-    private val BASE_URL = "http://10.105.168.234:8000"
+    private val BASE_URL = "http://10.105.168.231:8000"
 
     //http://10.105.169.83:3000
     private val TAG: String = "CHECK_RESPONSE"
 
     private var responseAPI = ""
+
+    val stationsViewModel: StationsViewModel by viewModels()
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,6 +85,15 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+        stationsViewModel.onCreate()
+
+        stationsViewModel.stationModel.observe(this) {
+            Log.i("StationsViewModel", it.toString())
+            val manager = LinearLayoutManager(this@MainActivity)
+            binding.rvStations.layoutManager = manager
+            binding.rvStations.adapter = StationsAdapter(it.filter { it.al_status != 5 })
+        }
+
 
         mSocket.on("station_alarm_for_user") { args ->
             Log.i("Args", args[0].toString())
@@ -88,20 +102,35 @@ class MainActivity : ComponentActivity() {
                 val stationAlarmed = args[0] as String
 
 
-                Log.i("Alarmed", stationAlarmed)
+                Log.i("Alarmed_Start", StationsProvider.stations.toString())
 
                 val gson = Gson()
                 val stationAlarmedObj: Stations =
                     gson.fromJson(stationAlarmed, Stations::class.java)
                 Log.i("Alarmed", stationAlarmedObj.toString())
 
-                runOnUiThread {
-                    stationsList += stationAlarmedObj
-                    val manager = LinearLayoutManager(this@MainActivity)
-                    binding.rvStations.layoutManager = manager
-                    binding.rvStations.adapter = StationsAdapter(stationsList)
+                //Add stationAlarmedObj to stationModel from StationsViewModel
+                //Modify Station model with new alarm status when alarm already exist on stationModel
+                val currentStations = stationsViewModel.stationModel.value?.toMutableList()
+
+                if (currentStations != null) {
+                    currentStations.filter { it.al_status != 5}
+
+                    if (currentStations.find{ it.id_stations == stationAlarmedObj.id_stations } != null) {
+                        val index = currentStations.indexOf(currentStations.find{ it.id_stations == stationAlarmedObj.id_stations })
+                        currentStations[index] = stationAlarmedObj
+                        stationsViewModel.stationModel.postValue(currentStations)
+                        Log.i("StationsViewModel", currentStations.toString())
+                    }else{
+                        currentStations.add(stationAlarmedObj)
+                        stationsViewModel.stationModel.postValue(currentStations)
+                        Log.i("StationsViewModel", currentStations.toString())
+                    }
+                }else{
+                    stationsViewModel.stationModel.postValue(listOf(stationAlarmedObj))
                 }
 
+                //Make the phone vibrate
                 val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
                 if (vibrator.hasVibrator()) { // Vibrator availability checking
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -119,10 +148,10 @@ class MainActivity : ComponentActivity() {
         }
 
         mSocket.connect()
-        loadAlarms()
+
     }
 
-    private fun loadAlarms() {
+    /*private fun loadAlarms() {
         var alarmsJson = ""
 
         val apiStations = Retrofit.Builder()
@@ -137,20 +166,26 @@ class MainActivity : ComponentActivity() {
                     call: Call<List<Stations>>,
                     response: Response<List<Stations>>
                 ) {
-                    val activeAlarms = response.body()!!
-                    Log.i("SupportAlarms_code", activeAlarms[0].id.toString())
-                    //Make a dataclass that include al_status, make the sql query to ive back the al_status field when askin for stations with alarm
-                    stationsList += activeAlarms
+                    if (response.body()!!.isNotEmpty()) {
+                        val activeAlarms = response.body()!!
+                        Log.i("SupportAlarms_code", activeAlarms[0].id.toString())
+                        //Make a dataclass that include al_status, make the sql query to ive back the al_status field when asking for stations with alarm
+                        stationsList += activeAlarms
 
-                    val manager = LinearLayoutManager(this@MainActivity)
-                    binding.rvStations.layoutManager = manager
-                    binding.rvStations.adapter = StationsAdapter(stationsList)
+                        val manager = LinearLayoutManager(this@MainActivity)
+                        binding.tvTitle2.text = getText(R.string.title_alarms_activated)
+                        binding.rvStations.layoutManager = manager
+                        binding.rvStations.adapter = StationsAdapter(stationsList)
+                    }else{
+                        binding.tvTitle2.text = getText(R.string.title_no_alarms)
+                    }
+
                 }
 
                 override fun onFailure(call: Call<List<Stations>>, t: Throwable) {
                     TODO("Not yet implemented")
                 }
             })
-    }
+    }*/
 }
 

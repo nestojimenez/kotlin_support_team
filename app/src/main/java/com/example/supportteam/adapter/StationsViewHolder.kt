@@ -39,8 +39,18 @@ class StationsViewHolder (view: View): RecyclerView.ViewHolder(view){
         }
 
         val red = ContextCompat.getColor(binding.card.context, com.example.supportteam.R.color.red)
+        val yellow = ContextCompat.getColor(binding.card.context, com.example.supportteam.R.color.yellow)
+        val purple = ContextCompat.getColor(binding.card.context, com.example.supportteam.R.color.purple)
+        val pink = ContextCompat.getColor(binding.card.context, com.example.supportteam.R.color.pink)
+        val white = ContextCompat.getColor(binding.card.context, com.example.supportteam.R.color.white)
+
         when(stationModel.al_status){
             1 -> binding.card.setCardBackgroundColor(red);
+            2 -> binding.card.setCardBackgroundColor(yellow)
+            3 -> binding.card.setCardBackgroundColor(purple)
+            4 -> binding.card.setCardBackgroundColor(pink)
+            5 -> binding.card.setCardBackgroundColor(white)
+            else -> binding.card.setCardBackgroundColor(white)
         }
     }
 }

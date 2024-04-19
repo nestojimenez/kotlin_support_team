@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">SupportTeam</string>
+
+    <string name="main_title">The following stations require your support</string>
+    <string name="title_no_alarms">No Alarms Activated!</string>
+    <string name="title_alarms_activated">Please be at the Station and proceed to acknowledge</string>
 </resources>

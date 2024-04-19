@@ -80,6 +80,9 @@ dependencies {
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
 
+    // Coroutines to make the HTTP requests asynchronous(In the background thread)
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.6")
+
     // Kotlin serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
 

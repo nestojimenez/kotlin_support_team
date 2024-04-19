@@ -3,6 +3,7 @@ package com.example.supportteam.api
 import com.example.supportteam.dataclasses.Stations
 import com.example.supportteam.dataclasses.SupportAlarms
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 
@@ -15,4 +16,8 @@ interface MyApi {
 
     @GET("stations/{id}")
     fun getStationsById(@Path("id") id:Int?): Call<List<Stations>>
+
+    //Suspend function
+    @GET("support_alarm_last")
+    suspend fun getAllStations(): Response<List<Stations>>
 }
