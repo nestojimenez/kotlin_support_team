@@ -19,7 +19,7 @@ class StationsViewModel : ViewModel() {
         viewModelScope.launch {
             Log.d("Creado", "En rutina de onCreate")
             val result = getAllStationsUseCase()
-            Log.d("Creado", "Get all stations correcto")
+            Log.d("Creado", result.toString())
             if(!result.isNullOrEmpty()){
                 stationModel.postValue(result)
                 Log.d("Creado", "En rutina de postvalue")

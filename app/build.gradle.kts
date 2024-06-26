@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "com.fabrikatlas.supportteam"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 2
         versionName = "2.0"

@@ -22,12 +22,14 @@ import com.fabrikatlas.supportteam.services.RunningServices
 import com.fabrikatlas.supportteam.viewmodel.StationsViewModel
 import com.google.gson.Gson
 
-//TODO Add play sound when alarm is activated - DONE
-//TODO Add name of person triggering the alarm o changing status - DONE
-//TODO Add to DB all operators on floor - DONE
-//TODO Add current alarm time - DONE
-//TODO Add DiifUtil to update recyclerview in order to have a specific timer
-//TODO for each alarm - DONE
+//Add play sound when alarm is activated - DONE
+//Add name of person triggering the alarm o changing status - DONE
+//Add to DB all operators on floor - DONE
+//Add current alarm time - DONE
+//Add DiffUtil to update recyclerview in order to have a specific timer
+//for each alarm - DONE
+//TODO turn off sound by clicking each card - DONE
+//TODO add machine stations under alarm
 
 class MainActivity : ComponentActivity() {
 
@@ -120,7 +122,7 @@ class MainActivity : ComponentActivity() {
                     gson.fromJson(stationAlarmed, Stations::class.java)
                 Log.i("Alarmed", stationAlarmedObj.al_status.toString())
 
-                ringTone(stationAlarmedObj.al_status)
+                //ringTone(stationAlarmedObj.al_status)
                 //Add stationAlarmedObj to stationModel from StationsViewModel
                 //Modify Station model with new alarm status when alarm already exist on stationModel
                 val currentStations = stationsViewModel.stationModel.value?.toMutableList()
@@ -171,59 +173,5 @@ class MainActivity : ComponentActivity() {
         mSocket.connect()
 
     }
-
-    /*private fun loadAlarms() {
-        var alarmsJson = ""
-
-        val apiStations = Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(MyApi::class.java)
-
-        apiStations.getSupportAlarmStation(1)
-            .enqueue(object : Callback<List<Stations>> {
-                override fun onResponse(
-                    call: Call<List<Stations>>,
-                    response: Response<List<Stations>>
-                ) {
-                    if (response.body()!!.isNotEmpty()) {
-                        val activeAlarms = response.body()!!
-                        Log.i("SupportAlarms_code", activeAlarms[0].id.toString())
-                        //Make a dataclass that include al_status, make the sql query to ive back the al_status field when asking for stations with alarm
-                        stationsList += activeAlarms
-
-                        val manager = LinearLayoutManager(this@MainActivity)
-                        binding.tvTitle2.text = getText(R.string.title_alarms_activated)
-                        binding.rvStations.layoutManager = manager
-                        binding.rvStations.adapter = StationsAdapter(stationsList)
-                    }else{
-                        binding.tvTitle2.text = getText(R.string.title_no_alarms)
-                    }
-
-                }
-
-                override fun onFailure(call: Call<List<Stations>>, t: Throwable) {
-                    TODO("Not yet implemented")
-                }
-            })
-    }*/
-
-    private fun ringTone (alStatus: Int){
-            Log.i("AlStatus", alStatus.toString())
-            if(alStatus == 1){
-                mediaPlayer = MediaPlayer.create(this, R.raw.the_kill_bill_whistl)
-                mediaPlayer.start()
-            }
-
-
-
-
-    }
-
-    //Create a function that start, stop and resets a timer
-
-
-
 }
 

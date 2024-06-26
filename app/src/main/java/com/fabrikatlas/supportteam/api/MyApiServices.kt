@@ -18,6 +18,7 @@ class MyApiServices {
             try {
                 val response: Response<List<Stations>> =
                     retrofit.create(MyApi::class.java).getAllStations()
+                Log.i("NetworkConnection", response.body().toString())
                 response.body() ?: emptyList()
             } catch (e: Exception) {
                 Log.i("NetworkConnectionError", e.toString())
